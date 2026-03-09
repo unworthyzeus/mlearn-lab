@@ -1,0 +1,122 @@
+--- Cell 55 (code) ---
+from sklearn.model_selection import cross_val_score, KFold
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Set up 5-fold cross-validation
+kfold = KFold(n_splits=5, shuffle=True, random_state=42)
+
+# Compute MSE using cross-validation (negative because sklearn uses negative MSE)
+mse_scores = -cross_val_score(CarPrice, Input, Price, cv=kfold, scoring='neg_mean_squared_error')
+rmse_scores = np.sqrt(mse_scores)
+
+# Compute R^2 using cross-validation
+r2_scores = cross_val_score(CarPrice, Input, Price, cv=kfold, scoring='r2')
+
+# Display results
+print("Cross-Validation Results (5-Fold):")
+print(f"MSE scores: {mse_scores}")
+print(f"Mean MSE: {mse_scores.mean():.2f} (+/- {mse_scores.std():.2f})")
+print(f"\nRMSE scores: {rmse_scores}")
+print(f"Mean RMSE: {rmse_scores.mean():.2f} (+/- {rmse_scores.std():.2f})")
+print(f"\nR^2 scores: {r2_scores}")
+print(f"Mean R^2: {r2_scores.mean()*100:.2f}% (+/- {r2_scores.std()*100:.2f}%)")
+------------------------------
+--- Cell 56 (markdown) ---
+ ### Excercise: <font color='red'> Create an infographic for the work done </font>
+1. Explain in words, why the cross validation provides a more accurate estimate of what happens with unseen data.
+2. Explain in words, the usefulness of having a confidence margin.
+------------------------------
+--- Cell 57 (markdown) ---
+ ### Excercise: <font color='red'> Create an infographic for the work done </font>
+ Use either notebooklm or any chat.
+ Refine the prompt so that the explanation of the work done is clear.
+------------------------------
+--- Cell 58 (markdown) ---
+### Excercise: <font color='red'> Create an executive report </font>
+Write a short assessment of the work done. Difficulties, challenges, and proposals for a solution.
+
+------------------------------
+--- Cell 59 (markdown) ---
+### Excercise: <font color='red'> Repeat the practice with the database **Wine Quality** target (**quality**) </font>
+------------------------------
+--- Cell 60 (code) ---
+File = "winequality-red.csv"
+Filename = os.path.join(os.getcwd(),'Data',File)
+print(f'Filename with path: \n {Filename}')
+Data = pd.read_csv(Filename)
+Data.head().T
+
+------------------------------
+--- Cell 61 (markdown) ---
+## Appendix:
+### Description of the variables
+ 1. make: The name of the produces of the car (a factor).
+ - alfa-romero, audi, bmw, chevrolet, dodge, honda,  isuzu, jaguar, mazda, mercedes-benz, mercury,mitsubishi, nissan, peugot, plymouth, porsche,renault, saab, subaru, toyota, volkswagen, volvo
+ 
+2. fuel-type: The type of fuel used by the car, either diesel or gas (a factor).
+ - diesel, gas.
+3. aspiration:	Type of aspiration of fuel in the motor
+- std, turbo.
+4. num-of-doors: The number of passenger doors, either two or four (a factor).
+ - four, two.
+5. body-styleThe type of the car (a factor).
+- hardtop, wagon, sedan, hatchback, convertible.
+6. drive-wheels: The wheels powered by the engine (a factor).
+- 4wd, fwd, rwd.
+7. engine-location: The location in the car of the engine (a factor).
+- front, rear.
+8. wheel-base: The distance between the centers of the front and rear wheels in inches (numeric).	
+- continuous from 86.6 120.9.
+9. length: The length of the body of the car in inches (numeric).
+- continuous from 141.1 to 208.1.
+10. width: The width of the body of the car in inches (numeric).
+- continuous from 60.3 to 72.3.
+11. height: The height of the car in inches (numeric).
+- continuous from 47.8 to 59.8.
+12. curb-weight: The total weight in pounds of a vehicle with standard equipment and a full tank of fuel, but with no passengers or cargo (numeric).	 
+- continuous from 1488 to 4066.
+13. engine-type: Mechanical Feature  (numeric).	 
+- dohc, dohcv, l, ohc, ohcf, ohcv, rotor.
+14. num-of-cylinders:: Mechanical Feature  (a factor).
+- eight, five, four, six, three, twelve, two.
+15. engine-size: The volume swept by all the pistons inside the cylinders in cubic inches (numeric).
+ - continuous from 61 to 326.
+16. fuel-system: Mechanical Feature  (a factor).
+- 1bbl, 2bbl, 4bbl, idi, mfi, mpfi, spdi, spfi.
+17. bore: Mechanical Feature  (numeric).	
+- continuous from 2.54 to 3.94.
+18. stroke: Mechanical Feature  (numeric).	 
+- continuous from 2.07 to 4.17.
+19. compression-ratio: Mechanical Feature  (numeric).	  
+- continuous from 7 to 23.
+20. horsepower: The power of the engine in horsepowers (numeric).	
+- continuous from 48 to 288.
+21. peak-rpm: The top speed of the engine in rounds-per-minute (numeric).
+- continuous from 4150 to 6600.
+22. city-mpg: The fuel consumption of the car in city driving conditions, measured as miles per gallon of fuel (numeric).	 
+- continuous from 13 to 49.
+23. highway-mpg: The fuel consumption of the car in highway driving conditions, measured as miles per gallon of fuel (numeric).	 
+- continuous from 16 to 54.
+24. price: The retail price of the car in US Dollars (numeric).	
+- continuous from 5118 to 45400.
+
+    
+------------------------------
+--- Cell 62 (markdown) ---
+## Description of variables: Wine  quality
+### Input variables (based on physicochemical tests):
+1. fixed acidity
+2. volatile acidity
+3. citric acid
+4. residual sugar
+5. chlorides
+6. free sulfur dioxide
+7. total sulfur dioxide
+8. density
+9. pH
+10. sulphates
+11. alcohol
+Output variable (based on sensory data): 
+12. quality (score between 0 and 10)
+
+------------------------------

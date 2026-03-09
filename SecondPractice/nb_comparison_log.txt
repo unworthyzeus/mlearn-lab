@@ -1,0 +1,124 @@
+--- OG Summary ---
+0: markdown | # Practice 2. ##  Objectives: 1. Learn to clean data with pandas.  2. Do a simple Linear regression 
+1: markdown | ___________________________________
+2: markdown | ## First we load the Libraries * Pandas: For dealing with tabulated data: excel + sql * sklearn: Mac
+3: code | import pandas as pd import os
+4: code | import matplotlib.pyplot as plt import numpy as np import sklearn
+5: markdown | ### Use the os library for generating the path to the file
+6: code | File = "Bdcars.csv" Filename = os.path.join(os.getcwd(),'Data',File) print(f'Filename with path: \n 
+7: markdown | ### First rows of the file **make, fuel-type, aspiration, num-of-doors, body-style, drive-wheels, en
+8: markdown | ### Load the data by means of Pandas - Note that the structure is a csv: Comma separated values - Th
+9: markdown | #  See Appendix for  the meaning of the variables.
+10: code | Data = pd.read_csv(Filename) Data.head()
+11: code | print(f'Size of the database: {Data.shape} (rows X columns)')
+12: markdown | ## Next we get general information about the dataframe ## Dtype -> will allow to see which transform
+13: code | Data.info()
+14: markdown | ## First we clean the price feature ###  We erraise the unknowns '?'
+15: code | Data =Data[Data[' price'] != '?'] Data[' price'] = Data[' price'].astype('float') print('*'*30) prin
+16: code | 
+17: markdown | ## Next we deal with the categorical data. ###  Get the unique data, observe the return object is a 
+18: code | NamesMake = Data[' make'].unique() print(NamesMake)
+19: markdown | ###  We create a code for each of the makes. **NOTE**:  Categorical features, there is no order.  **
+20: code | CodeMake = list(range(len(NamesMake)))  MappingName2code = {key:float(val) for (key,val)  in zip(Nam
+21: code | 
+22: code | Data[' make'].map(MappingName2code)
+23: code | Data[' make'] = Data[' make'].map(MappingName2code) Data.T.head()
+24: markdown | ### Excercise: <font color='red'>Correct all the categorical fields </font>  Note: In case there is 
+25: markdown | ### Next we will eraise the columns that have not been corrected.  ### Also will correct the integer
+26: code | Data.columns
+27: code | TypeOfColumn = Data.dtypes print(TypeOfColumn)
+28: code | cols2drop = list() for col,dtype in zip(Data.columns,TypeOfColumn):     print(f' Name of columns:{co
+29: code | print(cols2drop)
+30: code | Data.drop(cols2drop,axis = 1).T
+31: code | Data = Data.drop(cols2drop,axis = 1)
+32: markdown | ## Before doing the linear regression analize the scatter plots
+33: code | ax = pd.plotting.scatter_matrix(Data,figsize = (10,10))
+34: markdown | ### Excercise  1. <font color='red'> Relate price (target) to a subset of features </font> 2. <font 
+35: code | print(Data.columns.values)
+36: code | ax = pd.plotting.scatter_matrix(Data[[' city-mpg',' length',' engine-size',' price']],figsize = (10,
+37: markdown | ### Excercise  1. <font color='red'> Explain in words, why correlation between input variables is ba
+38: markdown | ## Now we will make a model that predicts the price given the features  ###  Note that it will be a 
+39: code | Input = Data[[' make', ' wheel-base' ,' length', ' width' ,' height', ' curb-weight',  ' engine-size
+40: markdown | ### Next we estimate the parameters by **min squares**
+41: code | from sklearn import linear_model CarPrice = linear_model.LinearRegression() CarPrice.fit (Input, Pri
+42: code | print(Input.columns)
+43: code | df_car_coef = pd.DataFrame(CarPrice.coef_,columns = Input.columns) df_car_coef
+44: code | _ = df_car_coef.T.plot(kind = 'bar',figsize = (10,10),legend = False)
+45: markdown | ### Excercise  1. <font color='red'> Explain in words, the meaning of each of the values of the weig
+46: markdown | ## We will see how it works over the training database. ### Note that the correct way is to use a va
+47: code | PredictedPrice  = CarPrice.predict(Input)
+48: markdown | ### Scatter plot.  * Ideal relationship should be linear
+49: code | plt.scatter(Price, PredictedPrice,   color='black') plt.title(' Scatter plot: PredictedPrice vs Pric
+50: markdown | ## Performance of the model on the training database  * Mean squared error:     $\text{MSE}(y, \hat{
+51: code | from sklearn.metrics import mean_squared_error print (f'MSE = {mean_squared_error(Price, PredictedPr
+52: code | from sklearn.metrics import r2_score print (f'Explained Variance: $r^2$ = {r2_score(Price, Predicted
+53: markdown | ### Excercise  1. <font color='red'> Explain in words, why r^2 is more usefull than MSE. </font>
+54: markdown | ##  Need for Cross-validation  ###  Definition Cross-validation is a statistical technique used in m
+55: code | from sklearn.model_selection import cross_val_score, KFold from sklearn.metrics import mean_squared_
+56: markdown | ### Excercise: <font color='red'> Create an infographic for the work done </font> 1. Explain in word
+57: markdown | ### Excercise: <font color='red'> Create an infographic for the work done </font>  Use either notebo
+58: markdown | ### Excercise: <font color='red'> Create an executive report </font> Write a short assessment of the
+59: markdown | ### Excercise: <font color='red'> Repeat the practice with the database **Wine Quality** target (**q
+60: code | File = "winequality-red.csv" Filename = os.path.join(os.getcwd(),'Data',File) print(f'Filename with 
+61: markdown | ## Appendix: ### Description of the variables  1. make: The name of the produces of the car (a facto
+62: markdown | ## Description of variables: Wine  quality ### Input variables (based on physicochemical tests): 1. 
+
+--- Current Summary ---
+0: markdown | # Practice 2. ##  Objectives: 1. Learn to clean data with pandas.  2. Do a simple Linear regression 
+1: markdown | ___________________________________
+2: markdown | ## First we load the Libraries * Pandas: For dealing with tabulated data: excel + sql * sklearn: Mac
+3: code | import pandas as pd import os
+4: code | import matplotlib.pyplot as plt import numpy as np import sklearn
+5: markdown | ### Use the os library for generating the path to the file
+6: code | File = "Bdcars.csv" Filename = os.path.join(os.getcwd(),'Data',File) print(f'Filename with path: \n 
+7: markdown | ### First rows of the file **make, fuel-type, aspiration, num-of-doors, body-style, drive-wheels, en
+8: markdown | ### Load the data by means of Pandas - Note that the structure is a csv: Comma separated values - Th
+9: markdown | #  See Appendix for  the meaning of the variables.
+10: code | Data = pd.read_csv(Filename) Data.head()
+11: code | print(f'Size of the database: {Data.shape} (rows X columns)')
+12: markdown | ## Next we get general information about the dataf33rame ## Dtype -> will allow to see which transfo
+13: code | Data.info()
+14: markdown | ## First we clean the price feature ###  We erraise the unknowns '?'
+15: code | Data =Data[Data[' price'] != '?'] Data[' price'] = Data[' price'].astype('float') print('*'*30) prin
+16: code | 
+17: markdown | ## Next we deal with the categorical data. ###  Get the unique data, observe the return object is a 
+18: code | NamesMake = Data[' make'].unique() print(NamesMake)
+19: markdown | ###  We create a code for each of the makes. **NOTE**:  Categorical features, there is no order.  **
+20: code | CodeMake = list(range(len(NamesMake)))  MappingName2code = {key:float(val) for (key,val)  in zip(Nam
+21: code | 
+22: code | Data[' make'].map(MappingName2code)
+23: code | Data[' make'] = Data[' make'].map(MappingName2code) Data.T.head()
+24: markdown | ### Excercise: <font color='red'>Correct all the categorical fields </font>  Note: In case there is 
+25: markdown | ### Next we will eraise the columns that have not been corrected.  ### Also will correct the integer
+26: code | Data.columns
+27: code | TypeOfColumn = Data.dtypes print(TypeOfColumn)
+28: code | cols2drop = list() for col,dtype in zip(Data.columns,TypeOfColumn):     print(f' Name of columns:{co
+29: code | print(cols2drop)
+30: code | Data.drop(cols2drop,axis = 1).T
+31: code | Data = Data.drop(cols2drop,axis = 1)
+32: markdown | ## Before doing the linear regression analize the scatter plots
+33: code | ax = pd.plotting.scatter_matrix(Data,figsize = (10,10))
+34: markdown | ### Exercise  1. <font color='red'> Relate price (target) to a subset of features </font> 2. <font c
+35: markdown | **Relation of Price to Features:** The 'price' of a vehicle is most directly affected by features li
+36: code | print(Data.columns.values)
+37: code | ax = pd.plotting.scatter_matrix(Data[[' city-mpg',' length',' engine-size',' price']],figsize = (10,
+38: markdown | **1. Explaining the plotted relationships:** *   **Between the input features:** `engine-size` and `
+39: markdown | ## Now we will make a model that predicts the price given the features  ###  Note that it will be a 
+40: code | Input = Data[[' make', ' wheel-base' ,' length', ' width' ,' height', ' curb-weight',  ' engine-size
+41: markdown | ### Next we estimate the parameters by **min squares**
+42: code | from sklearn import linear_model CarPrice = linear_model.LinearRegression() CarPrice.fit (Input, Pri
+43: markdown | ## We will see how it works over the training database. ### Note that the correct way is to use a va
+44: code | PredictedPrice  = CarPrice.predict(Input)
+45: markdown | ### Scatter plot.  * Ideal relationship should be linear
+46: code | plt.scatter(Price, PredictedPrice,   color='black') plt.title(' Scatter plot: PredictedPrice vs Pric
+47: markdown | ## Performance of the model on the training database  * Mean squared error:     $\text{MSE}(y, \hat{
+48: code | from sklearn.metrics import mean_squared_error print (f'MSE = {mean_squared_error(Price, PredictedPr
+49: code | from sklearn.metrics import r2_score print (f'Explained Variance: r^2 = {r2_score(Price, PredictedPr
+50: markdown | ### Excercise: <font color='red'> Repeat the practice with the database **Wine Quality** target (**q
+51: code | File = "winequality-red.csv" Filename = os.path.join(os.getcwd(),'Data',File) print(f'Filename with 
+52: markdown | ## Appendix: ### Description of the variables  1. make: The name of the produces of the car (a facto
+53: markdown | ## Description of variables: Wine  quality ### Input variables (based on physicochemical tests): 1. 
+54: markdown | ---
+55: markdown | ## Wine Quality Results and Infographic
+56: markdown | **Executive Report: Wine Quality Sensory Analysis**  **Methodological Summary and Results:** This se
+57: markdown | **Prompt to generate the Wine Quality Infographic (for Image Generators):** > "A professional, clean

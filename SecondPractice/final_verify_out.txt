@@ -1,0 +1,32 @@
+--- Cell 55 (code) ---
+from sklearn.model_selection import cross_val_score, KFold
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Set up 5-fold cross-validation
+kfold = KFold(n_splits=5, shuffle=True, random_state=42)
+
+# Compute MSE using cross-validation (negative because sklearn uses negative MSE)
+mse_scores = -cross_val_score(CarPrice, Input, Price, cv=kfold, scoring='neg_mean_squared_error')
+rmse_scores = np.sqrt(mse_scores)
+
+# Compute R^2 using cross-validation
+r2_scores = cross_val_score(CarPrice, Input, Price, cv=kfold, scoring='r2')
+
+# Display results
+print("Cross-Validation Results (5-Fold):")
+print(f"MSE scores: {mse_scores}")
+print(f"Mean MSE: {mse_scores.mean():.2f} (+/- {mse_scores.std():.2f})")
+print(f"\nRMSE scores: {rmse_scores}")
+print(f"Mean RMSE: {rmse_scores.mean():.2f} (+/- {rmse_scores.std():.2f})")
+print(f"\nR^2 scores: {r2_scores}")
+print(f"Mean R^2: {r2_scores.mean()*100:.2f}% (+/- {r2_scores.std()*100:.2f}%)")
+------------------------------
+--- Cell 56 (markdown) ---
+### **Exercises: Automobile Model Evaluation**
+1. <font color='red'>**Cross-validation Comparison:** Explain in words, why the cross validation provides a more accurate estimate of what happens with unseen data.</font>
+2. <font color='red'>**Confidence Margin:** Explain in words, the usefulness of having a confidence margin.</font>
+3. <font color='red'>**Infographic:** Create an infographic of the work done using NotebookLM or similar tool. Refine the prompt for clarity.</font>
+4. <font color='red'>**Executive Report:** Write a short assessment of the work done (Difficulties, challenges, and proposals for a solution).</font>
+
+------------------------------
+--- Cell 57 (markdown) ---

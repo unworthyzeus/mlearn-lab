@@ -1,0 +1,83 @@
+CELL OVERVIEW:
+Cell 0 (markdown): # Practice 2. ##  Objectives: 1. Learn to clean data with pandas.  2. Do a simple Linear regression  ## Aplication: Data
+Cell 1 (markdown): ___________________________________
+Cell 2 (markdown): ## First we load the Libraries * Pandas: For dealing with tabulated data: excel + sql * sklearn: Machine learning framew
+Cell 3 (code): import pandas as pd import os
+Cell 4 (code): import matplotlib.pyplot as plt import numpy as np import sklearn
+Cell 5 (markdown): ### Use the os library for generating the path to the file
+Cell 6 (code): File = "Bdcars.csv" Filename = os.path.join(os.getcwd(),'Data',File) print(f'Filename with path: \n {Filename}')
+Cell 7 (markdown): ### First rows of the file **make, fuel-type, aspiration, num-of-doors, body-style, drive-wheels, engine-location, wheel
+Cell 8 (markdown): ### Load the data by means of Pandas - Note that the structure is a csv: Comma separated values - The library recognizes
+Cell 9 (code): Data = pd.read_csv(Filename) Data.head()
+Cell 10 (code): print(f'Size of the database: {Data.shape} (rows X columns)')
+Cell 11 (markdown): ## Next we get general information about the dataframe ## Dtype -> will allow to see which transformations should be don
+Cell 12 (code): Data.info()
+Cell 13 (markdown): ## First we clean the price feature ###  We erraise the unknowns '?'
+Cell 14 (code): Data =Data[Data[' price'] != '?'] Data[' price'] = Data[' price'].astype('float') print('*'*30) print('Shape of the data
+Cell 15 (code): 
+Cell 16 (markdown): ## Next we deal with the categorical data. ###  Get the unique data, observe the return object is a Numpy Array of objec
+Cell 17 (code): NamesMake = Data[' make'].unique() print(NamesMake)
+Cell 18 (markdown): ###  We create a code for each of the makes. **NOTE**:  Categorical features, there is no order.  **SOLUTION**: Will be 
+Cell 19 (code): CodeMake = list(range(len(NamesMake)))  MappingName2code = {key:float(val) for (key,val)  in zip(NamesMake,CodeMake)} pr
+Cell 20 (code): 
+Cell 21 (code): Data[' make'].map(MappingName2code)
+Cell 22 (code): Data[' make'] = Data[' make'].map(MappingName2code) Data.T.head()
+Cell 23 (markdown): ### Exercise: <font color='red'>Correct all the categorical fields </font>  Note: In case there is an order, such as **n
+Cell 24 (markdown): ### Next we will eraise the columns that have not been corrected.  ### Also will correct the integers to floats.
+Cell 25 (code): Data.columns
+Cell 26 (code): TypeOfColumn = Data.dtypes print(TypeOfColumn)
+Cell 27 (code): cols2drop = list() for col,dtype in zip(Data.columns,TypeOfColumn):     print(f' Name of columns:{col}   \t||| Type of c
+Cell 28 (code): print(cols2drop)
+Cell 29 (code): Data.drop(cols2drop,axis = 1).T
+Cell 30 (code): Data = Data.drop(cols2drop,axis = 1)
+Cell 31 (markdown): ## Before doing the linear regression analize the scatter plots
+Cell 32 (code): ax = pd.plotting.scatter_matrix(Data,figsize = (10,10))
+Cell 33 (markdown): ### **Exercise: Relationship Analysis (Automobile)** 1. <font color='red'>**Relate price (target) to a subset of feature
+Cell 34 (code): print(Data.columns.values)
+Cell 35 (code): ax = pd.plotting.scatter_matrix(Data[[' city-mpg',' length',' engine-size',' price']],figsize = (10,10))
+Cell 36 (markdown): ### Exercise 1. <font color='red'> Explain in words, why correlation between input variables is bad, but with the output
+Cell 37 (markdown): ## Now we will make a model that predicts the price given the features  ###  Note that it will be a linear model.     * 
+Cell 38 (code): Input = Data[[' make', ' wheel-base' ,' length', ' width' ,' height', ' curb-weight',  ' engine-size', ' compression-rat
+Cell 39 (markdown): ### Next we estimate the parameters by **min squares**
+Cell 40 (code): from sklearn import linear_model CarPrice = linear_model.LinearRegression() CarPrice.fit (Input, Price)  print(CarPrice.
+Cell 41 (code): print(Input.columns)
+Cell 42 (code): df_car_coef = pd.DataFrame(CarPrice.coef_,columns = Input.columns) df_car_coef
+Cell 43 (code): _ = df_car_coef.T.plot(kind = 'bar',figsize = (10,10),legend = False)
+Cell 44 (markdown): ### Exercise 1. <font color='red'> Explain in words, the meaning of each of the values of the weights. What sense do the
+Cell 45 (markdown): ## We will see how it works over the training database. ### Note that the correct way is to use a validation database, w
+Cell 46 (code): PredictedPrice  = CarPrice.predict(Input)
+Cell 47 (markdown): ### Scatter plot.  * Ideal relationship should be linear
+Cell 48 (code): plt.scatter(Price, PredictedPrice,   color='black') plt.title(' Scatter plot: PredictedPrice vs Price') plt.plot(Price,P
+Cell 49 (markdown): ## Performance of the model on the training database  * Mean squared error:     $\text{MSE}(y, \hat{y}) = \frac{1}{n_\te
+Cell 50 (code): from sklearn.metrics import mean_squared_error print (f'MSE = {mean_squared_error(Price, PredictedPrice):2.2f} ') print 
+Cell 51 (code): from sklearn.metrics import r2_score print (f'Explained Variance: $r^2$ = {r2_score(Price, PredictedPrice)*100.:2.2f} %'
+Cell 52 (markdown): ### Exercise 1. <font color='red'> Explain in words, why r^2 is more usefull than MSE. </font>  **Why R^2 is more useful
+Cell 53 (markdown): ##  Need for Cross-validation  ###  Definition Cross-validation is a statistical technique used in machine learning to e
+Cell 54 (code): from sklearn.model_selection import cross_val_score, KFold from sklearn.metrics import mean_squared_error, r2_score  # S
+Cell 55 (markdown): ## Automobile Pricing: Interpretation and Results
+Cell 56 (markdown): ### **Exercise: Automobile Dataset Analysis**  1. <font color='red'>**Explain in words, the meaning of each of the value
+Cell 57 (markdown): ### **Automobile Price Prediction: Comprehensive Infographic Prompt** **Prompt to generate the Automobile Infographic:**
+Cell 58 (markdown): ## Practice 2 Part B: Wine Quality Analysis --- Following the same workflow as the Automobile dataset, we will now analy
+Cell 59 (markdown): ### 1. Load the Wine Data
+Cell 60 (code): File = "winequality-red.csv" Filename = os.path.join(os.getcwd(), 'Data', File) data_wine = pd.read_csv(Filename) data_w
+Cell 61 (markdown): ### 2. Data Exploration and Cleaning We check for null values and the data types of the features.
+Cell 62 (code): data_wine.info() print(f"\nNull values:\n{data_wine.isnull().sum()}")
+Cell 63 (markdown): ### 3. Visualizing Relationships (Scatter Matrix) Following the car model, we first look at how the variables relate to 
+Cell 64 (code): from pandas.plotting import scatter_matrix import matplotlib.pyplot as plt # Selecting a subset for clear visualization 
+Cell 65 (markdown): ### **Exercise: Relationship Analysis (Wine)**  1. <font color='red'>**Relate quality (target) to a subset of features (
+Cell 66 (markdown): ### 4. Database Selection for Modeling Defining the target variable (**quality**) and features.
+Cell 67 (code): Input_wine = data_wine.drop('quality', axis=1) Target_wine = data_wine['quality'] Input_wine.head()
+Cell 68 (markdown): ### 5. Parameter Estimation by Minimum Squares We train the Linear Regression model to find the best-fit line.
+Cell 69 (code): from sklearn import linear_model WineModel = linear_model.LinearRegression() WineModel.fit(Input_wine, Target_wine)  pri
+Cell 70 (markdown): ### 6. Coefficient Analysis We visualize the weights to see which chemical properties influence our prediction model the
+Cell 71 (code): coefs = pd.DataFrame(WineModel.coef_, index=Input_wine.columns, columns=['Coefficient']) coefs = coefs.sort_values(by='C
+Cell 72 (markdown): ### 7. Predictions and Performance Visualization Mapping the predicted values vs actual sensory data.
+Cell 73 (code): PredictedQuality = WineModel.predict(Input_wine) plt.figure(figsize=(8,6)) plt.scatter(Target_wine, PredictedQuality, co
+Cell 74 (markdown): ### 8. Numerical Evaluation (R² and MSE)
+Cell 75 (code): from sklearn.metrics import mean_squared_error, r2_score print(f'MSE (Wine) = {mean_squared_error(Target_wine, Predicted
+Cell 76 (markdown): ### 9. Cross-Validation (10-Fold) To get a robust estimation of performance on unseen data.
+Cell 77 (code): from sklearn.model_selection import cross_val_score, KFold kfold = KFold(n_splits=10, shuffle=True, random_state=42) r2_
+Cell 78 (markdown): 1. <font color='red'>**Cross-validation Comparison:** Explain in words, why the cross validation provides a more accurat
+Cell 79 (markdown): ## Wine Quality: Interpretation and Results
+Cell 80 (markdown): ### **Exercise: Wine Dataset Analysis**  1. <font color='red'>**Explain in words, the meaning of each of the values of t
+Cell 81 (markdown): ## Appendix: ### Description of the variables (Automobile)  1. make: The name of the produces of the car (a factor).  2.

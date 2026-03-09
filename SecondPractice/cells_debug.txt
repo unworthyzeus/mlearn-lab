@@ -1,0 +1,491 @@
+=== Cell 0 (markdown) ===
+# Practice 2.
+## Guillem Moreno Garcia
+##  Objectives:
+1. Learn to clean data with pandas.
+
+2. Do a simple Linear regression
+
+## Aplication:
+Data basse: Data set from the UCI Machine Learning Repository
+(http://archive.ics.uci.edu/ml)
+1.   Cars data: http://archive.ics.uci.edu/ml/datasets/Automobile.
+- Predict **price** in dollars.
+
+2. Database: Wine quality, http://archive.ics.uci.edu/ml/datasets/Wine+Quality
+- Predict **quality** (score between 0 and 10)
+
+
+=== Cell 1 (markdown) ===
+___________________________________
+
+=== Cell 2 (markdown) ===
+## First we load the Libraries
+* Pandas: For dealing with tabulated data: excel + sql
+* sklearn: Machine learning framework
+* os: anciliary functions for dealing with the operating system
+
+=== Cell 3 (code) ===
+import pandas as pd
+import os 
+
+=== Cell 4 (code) ===
+import matplotlib.pyplot as plt
+import numpy as np
+import sklearn
+
+=== Cell 5 (markdown) ===
+### Use the os library for generating the path to the file
+
+=== Cell 6 (code) ===
+File = "Bdcars.csv"
+Filename = os.path.join(os.getcwd(),'Data',File)
+print(f'Filename with path: \n {Filename}')
+
+=== Cell 7 (markdown) ===
+### First rows of the file
+**make, fuel-type, aspiration, num-of-doors, body-style, drive-wheels, engine-location, wheel-base, length, width, height, curb-weight, engine-type, num-of-cylinders, engine-size, fuel-system, bore, stroke, compression-ratio, horsepower, peak-rpm, city-mpg, highway-mpg, price**
+
+alfa-romero,gas,std,two,convertible,rwd,front,88.60,168.80,64.10,48.80,2548,dohc,four,130,mpfi,3.47,2.68,9.00,111,5000,21,27,13495
+
+alfa-romero,gas,std,two,convertible,rwd,front,88.60,168.80,64.10,48.80,2548,dohc,four,130,mpfi,3.47,2.68,9.00,111,5000,21,27,16500
+
+alfa-romero,gas,std,two,hatchback,rwd,front,94.50,171.20,65.50,52.40,2823,ohcv,six,152,mpfi,2.68,3.47,9.00,154,5000,19,26,16500
+
+=== Cell 8 (markdown) ===
+### Load the data by means of Pandas
+- Note that the structure is a csv: Comma separated values
+- The library recognizes the first line as the name of the columns
+- Note the similarity with an *excel file*
+
+=== Cell 9 (markdown) ===
+#  See Appendix for  the meaning of the variables.
+
+=== Cell 10 (code) ===
+Data = pd.read_csv(Filename)
+Data.head()
+
+=== Cell 11 (code) ===
+print(f'Size of the database: {Data.shape} (rows X columns)')
+
+=== Cell 12 (markdown) ===
+## Next we get general information about the dataframe
+## Dtype -> will allow to see which transformations should be done
+
+=== Cell 13 (code) ===
+Data.info()
+
+=== Cell 14 (markdown) ===
+## First we clean the price feature
+###  We erraise the unknowns '?'
+
+=== Cell 15 (code) ===
+Data =Data[Data[' price'] != '?']
+Data[' price'] = Data[' price'].astype('float')
+print('*'*30)
+print('Shape of the data: ',Data.shape)
+print('*'*30)
+Data.info()
+
+=== Cell 16 (code) ===
+
+
+=== Cell 17 (markdown) ===
+## Next we deal with the categorical data.
+###  Get the unique data, observe the return object is a Numpy Array of objects (strings)
+###  Note: This can be done in a more straight forward way, but  the idea is to get used with the basics of pandas.
+
+=== Cell 18 (code) ===
+NamesMake = Data[' make'].unique()
+print(NamesMake)
+
+=== Cell 19 (markdown) ===
+###  We create a code for each of the makes.
+**NOTE**:  Categorical features, there is no order. 
+**SOLUTION**: Will be given in decision trees.
+
+### We use an implementation of 'dict comprehension' and '.map()'
+
+=== Cell 20 (code) ===
+CodeMake = list(range(len(NamesMake)))
+
+MappingName2code = {key:float(val) for (key,val)  in zip(NamesMake,CodeMake)}
+print(MappingName2code)
+
+=== Cell 21 (code) ===
+
+
+=== Cell 22 (code) ===
+Data[' make'].map(MappingName2code)
+
+=== Cell 23 (code) ===
+Data[' make'] = Data[' make'].map(MappingName2code)
+Data.T.head()
+
+=== Cell 24 (markdown) ===
+ ### Exercise: <font color='red'>Correct all the categorical fields </font>
+ Note: In case there is an order, such as **num-of-doors** make a coding that follows the order.
+
+=== Cell 25 (code) ===
+# Correcting categorical fields and cleaning '?'
+for col in [' bore', ' stroke', ' horsepower', ' peak-rpm']:
+    Data = Data[Data[col] != '?']
+    Data[col] = Data[col].astype('float')
+
+doors_map = {'two': 2, 'four': 4}
+cylinders_map = {'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'eight': 8, 'twelve': 12}
+
+Data[' num-of-doors'] = Data[' num-of-doors'].map(doors_map)
+Data[' num-of-cylinders'] = Data[' num-of-cylinders'].map(cylinders_map)
+
+# Integer mapping for nominal fields (label encoding)
+nominal_cols = [' fuel-type', ' aspiration', ' body-style', ' drive-wheels', ' engine-location', ' engine-type', ' fuel-system']
+for col in nominal_cols:
+    Data[col] = Data[col].astype('category').cat.codes.astype(float)
+
+# In case some rows have NaNs after mapping
+Data = Data.dropna()
+Data = Data.astype(float)
+
+cols2drop = [] # No columns dropped because all were corrected
+
+
+=== Cell 26 (markdown) ===
+ ### Next we will erase the columns that have not been corrected.
+ ### Also will correct the integers to floats.
+
+=== Cell 27 (code) ===
+Data.columns
+
+=== Cell 28 (code) ===
+TypeOfColumn = Data.dtypes
+print(TypeOfColumn)
+
+=== Cell 29 (code) ===
+cols2drop = list()
+for col,dtype in zip(Data.columns,TypeOfColumn):
+    print(f' Name of columns:{col}   \t||| Type of column: {dtype}')
+    if dtype == 'object':
+        cols2drop.append(col)
+
+=== Cell 30 (code) ===
+print(cols2drop)
+
+=== Cell 31 (code) ===
+Data.drop(cols2drop,axis = 1).T
+
+=== Cell 32 (code) ===
+Data = Data.drop(cols2drop,axis = 1)
+
+
+=== Cell 33 (markdown) ===
+## Before doing the linear regression analize the scatter plots
+
+
+=== Cell 34 (code) ===
+ax = pd.plotting.scatter_matrix(Data,figsize = (10,10))
+
+=== Cell 35 (markdown) ===
+### Exercise 
+1. <font color='red'> Relate price (target) to a subset of features </font>
+2. <font color='red'> Relate  subset of features ' city-mpg',' length',' engine-size' between themselves </font>
+
+* In theory we will explain why it is usefull, but first try to understand
+
+=== Cell 36 (code) ===
+print(Data.columns.values)
+
+=== Cell 37 (code) ===
+ax = pd.plotting.scatter_matrix(Data[[' city-mpg',' length',' engine-size',' price']],figsize = (10,10))
+
+=== Cell 38 (markdown) ===
+### Exercise 
+1. <font color='red'> Explain in words, why correlation between input variables is bad, but with the output is good. </font>
+
+
+=== Cell 39 (markdown) ===
+ ## Now we will make a model that predicts the price given the features
+ ###  Note that it will be a linear model. 
+ 
+ * The scatter plot indicates that possibly we could use second order polynomials for fitting, but we have freedom for deciding the model.
+ * There are other considerations for prefering a **linear model**.
+ ###  First we create the database.
+
+=== Cell 40 (code) ===
+Input = Data[[' make', ' wheel-base' ,' length', ' width' ,' height', ' curb-weight',
+ ' engine-size', ' compression-ratio', ' city-mpg', ' highway-mpg']]
+Price = Data[[' price']]
+
+=== Cell 41 (markdown) ===
+### Next we estimate the parameters by **min squares**
+
+=== Cell 42 (code) ===
+from sklearn import linear_model
+CarPrice = linear_model.LinearRegression()
+CarPrice.fit (Input, Price)
+
+print(CarPrice.coef_)
+print(CarPrice.intercept_)
+
+=== Cell 43 (code) ===
+print(Input.columns)
+
+=== Cell 44 (code) ===
+df_car_coef = pd.DataFrame(CarPrice.coef_,columns = Input.columns)
+df_car_coef
+
+=== Cell 45 (code) ===
+_ = df_car_coef.T.plot(kind = 'bar',figsize = (10,10),legend = False)
+
+
+=== Cell 46 (markdown) ===
+### Exercise 
+1. <font color='red'> Explain in words, the meaning of each of the values of the weights. What sense do they have? </font>
+
+2. <font color='red'> If collecting a database is expensive, what recommendation would you give? </font>
+
+
+=== Cell 47 (markdown) ===
+## We will see how it works over the training database.
+### Note that the correct way is to use a validation database, which we will see below
+
+=== Cell 48 (code) ===
+PredictedPrice  = CarPrice.predict(Input)
+
+=== Cell 49 (markdown) ===
+### Scatter plot. 
+* Ideal relationship should be linear
+
+=== Cell 50 (code) ===
+plt.scatter(Price, PredictedPrice,   color='black')
+plt.title(' Scatter plot: PredictedPrice vs Price')
+plt.plot(Price,Price)
+plt.xlabel('Price')
+plt.ylabel('PredictedPrice')
+plt.show()
+
+=== Cell 51 (markdown) ===
+## Performance of the model on the training database
+
+* Mean squared error:   
+ $\text{MSE}(y, \hat{y}) = \frac{1}{n_\text{samples}} \sum_{i=0}^{n_\text{samples} - 1} (y_i - \hat{y}_i)^2.$
+* Explained variance ($R^2$):   
+$R^2(y, \hat{y}) = 1 - \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{n} (y_i - \bar{y})^2}$
+
+=== Cell 52 (code) ===
+from sklearn.metrics import mean_squared_error
+print (f'MSE = {mean_squared_error(Price, PredictedPrice):2.2f} ')
+print (f'Root MSE = {np.sqrt(mean_squared_error(Price, PredictedPrice)):2.2f} ')
+
+=== Cell 53 (code) ===
+from sklearn.metrics import r2_score
+print (f'Explained Variance: $r^2$ = {r2_score(Price, PredictedPrice)*100.:2.2f} %')
+
+=== Cell 54 (markdown) ===
+### Exercise 
+1. <font color='red'> Explain in words, why r^2 is more usefull than MSE. </font>
+
+
+
+
+=== Cell 55 (markdown) ===
+**Why R^2 is more useful than MSE:**  
+While Mean Squared Error (MSE) provides an absolute measure of prediction error in the units of the target variable squared, it is highly dependent on the scale of the dataset. Therefore, it is difficult to judge whether a particular MSE is 'good' or 'bad' without context.  
+On the other hand, the Explained Variance ($R^2$) normalizes the error, providing a relative score between 0 and 1 (or 0% to 100%). It represents the proportion of variance in the target variable that is explained by the model, making it much easier to interpret and comparable across different datasets and target ranges.
+
+=== Cell 56 (markdown) ===
+##  Need for Cross-validation
+
+###  Definition
+Cross-validation is a statistical technique used in machine learning to evaluate how well a model generalizes to independent datasets.
+
+1. It consists of dividing the training dataset into several parts, or folds, typically between 5 and 10 (See figure below).
+<img src="EsquemaValidacioCreuada.png" width="60%">
+
+2. One of the folds is reserved as a test set, while the rest are used to train the model. This process is repeated as many times as there are folds, so that each part of the dataset acts as a test set once.
+
+3. Utility of validation:
+   1. Detects overfitting, i.e., when a model adapts too much to the specific details of the training data and does not perform well with new examples.
+   2. Through cross-validation, one can **better adjust the model parameters** to achieve a balance between fitting the training data and the ability to generalize.
+   3. Allows creating more robust and reliable models, increasing confidence in the predictions made by these models in real-world situations.
+
+=== Cell 57 (code) ===
+from sklearn.model_selection import cross_val_score, KFold
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Set up 5-fold cross-validation
+kfold = KFold(n_splits=5, shuffle=True, random_state=42)
+
+# Compute MSE using cross-validation (negative because sklearn uses negative MSE)
+mse_scores = -cross_val_score(CarPrice, Input, Price, cv=kfold, scoring='neg_mean_squared_error')
+rmse_scores = np.sqrt(mse_scores)
+
+# Compute R^2 using cross-validation
+r2_scores = cross_val_score(CarPrice, Input, Price, cv=kfold, scoring='r2')
+
+# Display results
+print("Cross-Validation Results (5-Fold):")
+print(f"MSE scores: {mse_scores}")
+print(f"Mean MSE: {mse_scores.mean():.2f} (+/- {mse_scores.std():.2f})")
+print(f"\nRMSE scores: {rmse_scores}")
+print(f"Mean RMSE: {rmse_scores.mean():.2f} (+/- {rmse_scores.std():.2f})")
+print(f"\nR^2 scores: {r2_scores}")
+print(f"Mean R^2: {r2_scores.mean()*100:.2f}% (+/- {r2_scores.std()*100:.2f}%)")
+
+=== Cell 58 (markdown) ===
+ ### Exercise: <font color='red'> Create an infographic for the work done </font>
+1. Explain in words, why the cross validation provides a more accurate estimate of what happens with unseen data.
+2. Explain in words, the usefulness of having a confidence margin.
+
+=== Cell 59 (markdown) ===
+**NotebookLM Prompt – Auto-MPG Infographic:**
+> "I built a machine learning model to predict car prices. I used the Auto-MPG dataset, cleaned missing values and encoded categorical variables, then trained a Linear Regression model validated with 5-Fold Cross-Validation (mean R² ≈ 72.5%). Create a clear and visually attractive infographic outline that shows at a glance: (1) the problem being solved (predicting car price), (2) the technique used (Linear Regression + Cross-Validation), and (3) whether the results were good (R² ~72.5% means a solid but improvable baseline). Keep it concise, professional, and easy to understand in under 30 seconds."
+
+<img src="unnamed (1).png" width="80%">
+
+=== Cell 60 (markdown) ===
+**1. Cross-validation for accurate estimates:**  
+Cross validation trains and evaluates the model on multiple different subsets of the data (folds), instead of relying on a single train-test split. This reduces the variance in the performance metric, preventing the score from being artificially high or low due to a 'lucky' or 'unlucky' split, thus providing an unbiased and more reliable estimate of the model's true performance on unseen data.  
+**2. Usefulness of a confidence margin:**  
+A confidence margin (like standard deviation of the RMSE across folds) tells us how stable or variable the model's performance is. A high variance means the model is highly sensitive to the specific data it is trained on. Knowing the bounds of performance allows decision makers to plan for the worst-case scenario and reliably trust the model's predictions within that margin.
+
+=== Cell 61 (markdown) ===
+ ### Exercise: <font color='red'> Create an infographic for the work done </font>
+ Use either notebooklm or any chat.
+ Refine the prompt so that the explanation of the work done is clear.
+
+=== Cell 62 (markdown) ===
+### Exercise: <font color='red'> Create an executive report </font>
+Write a short assessment of the work done. Difficulties, challenges, and proposals for a solution.
+
+
+=== Cell 63 (markdown) ===
+**Executive Report: Auto-MPG Car Price Prediction**
+
+A Linear Regression model was built to predict car retail prices using the Auto-MPG dataset. After cleaning the data (handling missing values and encoding categorical variables), the model achieved a cross-validated R² of ~72.5%, meaning it explains roughly 3 out of 4 units of price variability across unseen data splits.
+
+To improve results, the next step should be replacing label encoding with one-hot encoding for nominal categories (e.g. body style, fuel type) and testing non-linear models such as Random Forests, which better capture complex feature interactions. Feature scaling and outlier treatment would also be recommended before any further deployment.
+
+=== Cell 64 (markdown) ===
+### Exercise: <font color='red'> Repeat the practice with the database **Wine Quality** target (**quality**) </font>
+
+=== Cell 65 (markdown) ===
+**NotebookLM Prompt – Wine Quality Infographic:**
+> "I built a machine learning model to predict the quality score of red wine (0–10) using physicochemical inputs like pH, alcohol, and acidity from the Wine Quality dataset. I applied Linear Regression with 5-Fold Cross-Validation. Create a clear and visually attractive infographic outline that communicates at a glance: (1) the problem (predicting subjective wine quality from lab measurements), (2) the technique used (Linear Regression + Cross-Validation), and (3) whether results were good and what the main limitation was (moderate R² due to the ordinal/categorical nature of quality scores). Same format and depth as the Auto-MPG infographic."
+
+
+=== Cell 66 (markdown) ===
+**Executive Report: Wine Quality Prediction**
+
+A Linear Regression model was applied to the Red Wine Quality dataset to predict sensory quality scores (0–10) from physicochemical measurements (pH, alcohol, acidity, etc.). Cross-validated performance yielded a moderate R², indicating the linear model captures some signal but struggles with the integer-bounded, highly concentrated score distribution (most wines score 5 or 6).
+
+The main recommendation is to reframe this as a classification task using algorithms like Random Forest or Gradient Boosting, which are better suited to ordinal categorical targets. Addressing class imbalance (very few top/bottom scores) via oversampling techniques (e.g. SMOTE) would also significantly boost the model's ability to detect truly exceptional or poor vintages.
+
+=== Cell 67 (code) ===
+import os
+import pandas as pd
+from sklearn.model_selection import KFold, cross_val_score
+from sklearn.linear_model import LinearRegression
+import numpy as np
+
+File_wine = "winequality-red.csv"
+Filename_wine = os.path.join(os.getcwd(), 'Data', File_wine)
+print(f'Filename with path: \n {Filename_wine}')
+WineData = pd.read_csv(Filename_wine)
+
+WineInput = WineData.drop('quality', axis=1)
+WineTarget = WineData['quality']
+
+WineModel = LinearRegression()
+
+wine_kfold = KFold(n_splits=5, shuffle=True, random_state=42)
+wine_mse_scores = -cross_val_score(WineModel, WineInput, WineTarget, cv=wine_kfold, scoring='neg_mean_squared_error')
+wine_r2_scores = cross_val_score(WineModel, WineInput, WineTarget, cv=wine_kfold, scoring='r2')
+
+print("Wine Quality - Cross-Validation Results (5-Fold):")
+print(f"Mean MSE:   {wine_mse_scores.mean():.2f} (+/- {wine_mse_scores.std():.2f})")
+print(f"Mean RMSE:  {np.sqrt(wine_mse_scores).mean():.2f}")
+print(f"Mean R^2:   {wine_r2_scores.mean()*100:.2f}% (+/- {wine_r2_scores.std()*100:.2f}%)")
+
+
+=== Cell 68 (code) ===
+File = "winequality-red.csv"
+Filename = os.path.join(os.getcwd(),'Data',File)
+print(f'Filename with path: \n {Filename}')
+Data = pd.read_csv(Filename)
+Data.head().T
+
+
+=== Cell 69 (markdown) ===
+## Appendix:
+### Description of the variables
+ 1. make: The name of the produces of the car (a factor).
+ - alfa-romero, audi, bmw, chevrolet, dodge, honda,  isuzu, jaguar, mazda, mercedes-benz, mercury,mitsubishi, nissan, peugot, plymouth, porsche,renault, saab, subaru, toyota, volkswagen, volvo
+ 
+2. fuel-type: The type of fuel used by the car, either diesel or gas (a factor).
+ - diesel, gas.
+3. aspiration:	Type of aspiration of fuel in the motor
+- std, turbo.
+4. num-of-doors: The number of passenger doors, either two or four (a factor).
+ - four, two.
+5. body-styleThe type of the car (a factor).
+- hardtop, wagon, sedan, hatchback, convertible.
+6. drive-wheels: The wheels powered by the engine (a factor).
+- 4wd, fwd, rwd.
+7. engine-location: The location in the car of the engine (a factor).
+- front, rear.
+8. wheel-base: The distance between the centers of the front and rear wheels in inches (numeric).	
+- continuous from 86.6 120.9.
+9. length: The length of the body of the car in inches (numeric).
+- continuous from 141.1 to 208.1.
+10. width: The width of the body of the car in inches (numeric).
+- continuous from 60.3 to 72.3.
+11. height: The height of the car in inches (numeric).
+- continuous from 47.8 to 59.8.
+12. curb-weight: The total weight in pounds of a vehicle with standard equipment and a full tank of fuel, but with no passengers or cargo (numeric).	 
+- continuous from 1488 to 4066.
+13. engine-type: Mechanical Feature  (numeric).	 
+- dohc, dohcv, l, ohc, ohcf, ohcv, rotor.
+14. num-of-cylinders:: Mechanical Feature  (a factor).
+- eight, five, four, six, three, twelve, two.
+15. engine-size: The volume swept by all the pistons inside the cylinders in cubic inches (numeric).
+ - continuous from 61 to 326.
+16. fuel-system: Mechanical Feature  (a factor).
+- 1bbl, 2bbl, 4bbl, idi, mfi, mpfi, spdi, spfi.
+17. bore: Mechanical Feature  (numeric).	
+- continuous from 2.54 to 3.94.
+18. stroke: Mechanical Feature  (numeric).	 
+- continuous from 2.07 to 4.17.
+19. compression-ratio: Mechanical Feature  (numeric).	  
+- continuous from 7 to 23.
+20. horsepower: The power of the engine in horsepowers (numeric).	
+- continuous from 48 to 288.
+21. peak-rpm: The top speed of the engine in rounds-per-minute (numeric).
+- continuous from 4150 to 6600.
+22. city-mpg: The fuel consumption of the car in city driving conditions, measured as miles per gallon of fuel (numeric).	 
+- continuous from 13 to 49.
+23. highway-mpg: The fuel consumption of the car in highway driving conditions, measured as miles per gallon of fuel (numeric).	 
+- continuous from 16 to 54.
+24. price: The retail price of the car in US Dollars (numeric).	
+- continuous from 5118 to 45400.
+
+    
+
+=== Cell 70 (markdown) ===
+## Description of variables: Wine  quality
+### Input variables (based on physicochemical tests):
+1. fixed acidity
+2. volatile acidity
+3. citric acid
+4. residual sugar
+5. chlorides
+6. free sulfur dioxide
+7. total sulfur dioxide
+8. density
+9. pH
+10. sulphates
+11. alcohol
+Output variable (based on sensory data): 
+12. quality (score between 0 and 10)
+
+

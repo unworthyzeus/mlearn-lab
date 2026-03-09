@@ -1,0 +1,3 @@
+Cell 58: ### Exercise: <font color='red'> Create an executive report </font>
+Write a short assessment of the work done. Difficulties, challenges, and proposals for a solution.
+

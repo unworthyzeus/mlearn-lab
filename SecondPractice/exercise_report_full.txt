@@ -1,0 +1,23 @@
+--- Cell 24 ---
+ ### Exercise: <font color='red'>Correct all the categorical fields </font>
+ Note: In case there is an order, such as **num-of-doors** make a coding that follows the order.
+--------------------------------------------------
+--- Cell 34 ---
+### **Exercise: Relationship Analysis (Automobile)**
+1. <font color='red'>**Relate price (target) to a subset of features:**</font>
+**Answer:** The scatter matrix shows strong positive linear relationships between **price** and features like **engine-size** and **curb-weight**. This confirms that as the size and power of the car increase, the market value follows a predictable upward trend.
+
+2. <font color='red'>**Relate subset of features 'city-mpg',' length',' engine-size' between themselves:**</font>
+**Answer:** We observe clear mechanical dependencies: **engine-size** and **length** have a positive correlation (longer cars generally have larger engines), while **city-mpg** shows an inverse (negative) relationship with both size and weight. This reflects the engineering trade-off between vehicle mass and fuel efficiency.
+
+--------------------------------------------------
+--- Cell 64 ---
+### **Exercise: Relationship Analysis (Wine)**
+
+1. <font color='red'>**Relate quality (target) to a subset of features (alcohol, volatile acidity, sulphates):**</font>
+   **Answer:** Examining the scatter matrix against the target variable **quality**, we observe that **alcohol** and **sulphates** show a visible positive correlation with higher quality scores. Conversely, **volatile acidity** shows a downward trend, meaning wines with higher vinegar characteristics consistently receive lower sensory scores.
+
+2. <font color='red'>**Relate subset of features (for example, 'alcohol', 'volatile acidity', 'citric acid') between themselves:**</font>
+   **Answer:** The scatter matrix reveals that **citric acid** and **volatile acidity** show an inverse relationship in some clusters (higher citric often implies lower volatile acidity in stable wines). **Alcohol** appears relatively independent from the acidity metrics in this specific visualization, showing that quality is influenced by multiple distinct chemical profiles simultaneously.
+
+--------------------------------------------------

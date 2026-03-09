@@ -1,0 +1,174 @@
+--- Cell 70 (code) ---
+from sklearn.metrics import mean_squared_error, r2_score
+print(f'MSE (Wine) = {mean_squared_error(Target_wine, PredictedQuality):.4f}')
+print(f'Explained Variance (R²) = {r2_score(Target_wine, PredictedQuality)*100:.2f}%')
+
+--------------------------------------------------
+--- Cell 71 (markdown) ---
+### 6. Cross-Validation (5-Fold)
+To get a more reliable estimate of performance on unseen data.
+
+--------------------------------------------------
+--- Cell 72 (code) ---
+from sklearn.model_selection import cross_val_score, KFold
+kfold = KFold(n_splits=5, shuffle=True, random_state=42)
+
+# R2 Score
+r2_scores_wine = cross_val_score(WineModel, Input_wine, Target_wine, cv=kfold, scoring='r2')
+
+# MSE Score
+mse_scores_wine = -cross_val_score(WineModel, Input_wine, Target_wine, cv=kfold, scoring='neg_mean_squared_error')
+
+print("Cross-Validation results (Wine):")
+print(f"Mean R²: {r2_scores_wine.mean()*100:.2f}%")
+print(f"R² Standard Deviation: {r2_scores_wine.std()*100:.2f}%")
+print(f"Mean MSE: {mse_scores_wine.mean():.4f}")
+print(f"MSE Standard Deviation: {mse_scores_wine.std():.4f}")
+
+--------------------------------------------------
+--- Cell 73 (markdown) ---
+## Practice 2 Part B: Wine Quality Analysis
+---
+Following the same workflow as the Automobile dataset, we will now analyze the **Wine Quality** dataset manually to perform all the steps required in the original practice.
+
+--------------------------------------------------
+--- Cell 74 (markdown) ---
+### 1. Load the Wine Data
+
+--------------------------------------------------
+--- Cell 75 (code) ---
+File = "winequality-red.csv"
+Filename = os.path.join(os.getcwd(), 'Data', File)
+data_wine = pd.read_csv(Filename)
+data_wine.head()
+
+--------------------------------------------------
+--- Cell 76 (markdown) ---
+### 2. Data Exploration and Cleaning
+We check for null values and the data types of the features.
+
+--------------------------------------------------
+--- Cell 77 (code) ---
+data_wine.info()
+print(f"\nNull values:\n{data_wine.isnull().sum()}")
+
+--------------------------------------------------
+--- Cell 78 (markdown) ---
+### 3. Model Preparation
+Defining the target variable (**quality**) and features.
+
+--------------------------------------------------
+--- Cell 79 (code) ---
+X_wine = data_wine.drop('quality', axis=1)
+y_wine = data_wine['quality']
+X_wine.head()
+
+--------------------------------------------------
+--- Cell 80 (markdown) ---
+### 4. Linear Regression Model
+Training the model on the full dataset for initial evaluation.
+
+--------------------------------------------------
+--- Cell 81 (code) ---
+from sklearn import linear_model
+model_wine = linear_model.LinearRegression()
+model_wine.fit(X_wine, y_wine)
+predicted_wine = model_wine.predict(X_wine)
+
+--------------------------------------------------
+--- Cell 82 (markdown) ---
+### 5. Evaluation (R² and MSE)
+
+--------------------------------------------------
+--- Cell 83 (code) ---
+from sklearn.metrics import mean_squared_error, r2_score
+print(f'MSE (Wine) = {mean_squared_error(y_wine, predicted_wine):.4f}')
+print(f'Explained Variance (R²) = {r2_score(y_wine, predicted_wine)*100:.2f}%')
+
+--------------------------------------------------
+--- Cell 84 (markdown) ---
+### 6. Cross-Validation (5-Fold)
+To get a more reliable estimate of performance on unseen data.
+
+--------------------------------------------------
+--- Cell 85 (code) ---
+from sklearn.model_selection import cross_val_score, KFold
+kfold = KFold(n_splits=5, shuffle=True, random_state=42)
+
+# R2 Score
+r2_scores_wine = cross_val_score(model_wine, X_wine, y_wine, cv=kfold, scoring='r2')
+
+# MSE Score
+mse_scores_wine = -cross_val_score(model_wine, X_wine, y_wine, cv=kfold, scoring='neg_mean_squared_error')
+
+print("Cross-Validation results (Wine):")
+print(f"Mean R²: {r2_scores_wine.mean()*100:.2f}%")
+print(f"R² Standard Deviation: {r2_scores_wine.std()*100:.2f}%")
+print(f"Mean MSE: {mse_scores_wine.mean():.4f}")
+print(f"MSE Standard Deviation: {mse_scores_wine.std():.4f}")
+
+--------------------------------------------------
+--- Cell 86 (markdown) ---
+### 7. Wine Practice Conclusion
+Following the analysis above, we can now provide the executive report and infographic prompt based on these results.
+
+--------------------------------------------------
+--- Cell 87 (markdown) ---
+### **Infographic Specification: Decanting Data - Red Wine Quality**
+
+**Comprehensive Prompt for Image Generation:**
+> "Design a sophisticated data-driven infographic titled 'Decanting Data: Analyzing Wine Quality via Chemistry'. 
+> **Include these components:** 
+> 1. **Data Source:** Mention 'Red Wine Quality Dataset' mapping Physicochemical Lab Tests to Sensory Quality Scores (0-10).
+> 2. **Process:** Show the 'Linear Regression' modeling and '5-Fold Cross-Validation' methodology.
+> 3. **Metrics Panel:** Display prominently: 'Mean MSE: 0.43' and 'Mean R²: 34.24%'.
+> 4. **Analysis Note:** Add a visual or text saying 'Linear limit reached: Future recommendation for Random Forest or non-linear models'.
+> **Visual Style:** Elegant aesthetic with deep Bordeaux red, gold accents, and cream background. Mix laboratory glassware icons with wine-related illustrations. Professional and data-heavy style with clean charts."
+
+[REMOVED: PLACEHOLDER FOR NEW INFOGRAPHIC]
+
+--------------------------------------------------
+--- Cell 88 (markdown) ---
+## Appendix:
+### Description of the variables (Automobile)
+ 1. make: The name of the produces of the car (a factor).
+ 2. fuel-type: The type of fuel used by the car, either diesel or gas (a factor).
+ 3. aspiration: Type of aspiration of fuel in the motor
+ 4. num-of-doors: The number of passenger doors, either two or four (a factor).
+ 5. body-style: The type of the car (a factor).
+ 6. drive-wheels: The wheels powered by the engine (a factor).
+ 7. engine-location: The location in the car of the engine (a factor).
+ 8. wheel-base: Distance between centers of front and rear wheels (numeric).
+ 9. length: Length of the body in inches (numeric).
+ 10. width: Width of the body in inches (numeric).
+ 11. height: Height in inches (numeric).
+ 12. curb-weight: Total weight in pounds (numeric).
+ 13. engine-type: Mechanical Feature.
+ 14. num-of-cylinders: Mechanical Feature.
+ 15. engine-size: Displacement in cubic inches (numeric).
+ 16. fuel-system: Mechanical Feature.
+ 17. bore: Mechanical Feature (numeric).
+ 18. stroke: Mechanical Feature (numeric).
+ 19. compression-ratio: Mechanical Feature (numeric).
+ 20. horsepower: Power in horsepowers (numeric).
+ 21. peak-rpm: Top speed in rounds-per-minute (numeric).
+ 22. city-mpg: Fuel consumption in city (numeric).
+ 23. highway-mpg: Fuel consumption in highway (numeric).
+ 24. price: Retail price in US Dollars (numeric).
+
+## Description of variables: Wine Quality
+### Input variables:
+1. fixed acidity
+2. volatile acidity
+3. citric acid
+4. residual sugar
+5. chlorides
+6. free sulfur dioxide
+7. total sulfur dioxide
+8. density
+9. pH
+10. sulphates
+11. alcohol
+12. quality (score 0-10)
+
+--------------------------------------------------

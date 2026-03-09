@@ -1,0 +1,149 @@
+--- Cell 54 (markdown) ---
+##  Need for Cross-validation
+
+###  Definition
+Cross-validation is a statistical technique used in machine learning to evaluate how well a model generalizes to independent datasets.
+
+1. It consists of dividing the training dataset into several parts, or folds, typically between 5 and 10 (See figure below).
+<img src="EsquemaValidacioCreuada.png" width="60%">
+
+2. One of the folds is reserved as a test set, while the rest are used to train the model. This process is repeated as many times as there are folds, so that each part of the dataset acts as a test set once.
+
+3. Utility of validation:
+   1. Detects overfitting, i.e., when a model adapts too much to the specific details of the training data and does not perform well with new examples.
+   2. Through cross-validation, one can **better adjust the model parameters** to achieve a balance between fitting the training data and the ability to generalize.
+   3. Allows creating more robust and reliable models, increasing confidence in the predictions made by these models in real-world situations.
+--------------------------------------------------
+--- Cell 55 (code) ---
+from sklearn.model_selection import cross_val_score, KFold
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Set up 5-fold cross-validation
+kfold = KFold(n_splits=5, shuffle=True, random_state=42)
+
+# Compute MSE using cross-validation (negative because sklearn uses negative MSE)
+mse_scores = -cross_val_score(CarPrice, Input, Price, cv=kfold, scoring='neg_mean_squared_error')
+rmse_scores = np.sqrt(mse_scores)
+
+# Compute R^2 using cross-validation
+r2_scores = cross_val_score(CarPrice, Input, Price, cv=kfold, scoring='r2')
+
+# Display results
+print("Cross-Validation Results (5-Fold):")
+print(f"MSE scores: {mse_scores}")
+print(f"Mean MSE: {mse_scores.mean():.2f} (+/- {mse_scores.std():.2f})")
+print(f"\nRMSE scores: {rmse_scores}")
+print(f"Mean RMSE: {rmse_scores.mean():.2f} (+/- {rmse_scores.std():.2f})")
+print(f"\nR^2 scores: {r2_scores}")
+print(f"Mean R^2: {r2_scores.mean()*100:.2f}% (+/- {r2_scores.std()*100:.2f}%)")
+--------------------------------------------------
+--- Cell 56 (markdown) ---
+### **Exercises: Automobile Model Evaluation**
+1. <font color='red'>**Cross-validation Comparison:** Explain in words, why the cross validation provides a more accurate estimate of what happens with unseen data.</font>
+2. <font color='red'>**Confidence Margin:** Explain in words, the usefulness of having a confidence margin.</font>
+3. <font color='red'>**Infographic:** Create an infographic of the work done using NotebookLM or similar tool. Refine the prompt for clarity.</font>
+4. <font color='red'>**Executive Report:** Write a short assessment of the work done (Difficulties, challenges, and proposals for a solution).</font>
+
+--------------------------------------------------
+--- Cell 57 (markdown) ---
+## Results Context: Automobile Price Prediction (BDCars)
+
+---
+
+### **Interpretation of Model Performance**
+**1. Cross-validation for accurate estimates:**  
+Cross-validation trains and evaluates the model on multiple different subsets of the data (folds), instead of relying on a single train-test split. This reduces the variance in the performance metric, preventing the score from being artificially high or low due to a 'lucky' or 'unlucky' split, thus providing an unbiased and more reliable estimate of the model's true performance on unseen data.  
+
+**2. Usefulness of a confidence margin:**  
+A confidence margin (standard deviation of the R² across folds) tells us how stable the model's performance is. A high variance means the model is sensitive to specific data samples. Knowing these bounds allows decision-makers to set realistic expectations and trust the predictions within a known range of error.
+
+---
+
+### **Automobile Price Prediction: Infographic Outline**
+**Prompt to generate the Automobile Infographic:**
+> "I built a machine learning model to predict car prices using the Automobile (BDCars) dataset. I cleaned the data and trained a Linear Regression model validated with 5-Fold Cross-Validation (Mean R² ≈ 71.1%). Create a professional data science infographic outline that shows: (1) the problem (predicting car price), (2) the technique (Regression + Cross-Val), and (3) the results (R² ~71% is a solid baseline). Style: Modern, clean, dark theme with blue and white accents, vector art."
+
+<img src="unnamed (1).png" width="80%">
+
+---
+
+### **Executive Report: Automobile Car Price Prediction**
+
+**Methodological Summary and Results:**
+A Linear Regression model was implemented to predict car retail prices using the **BDCars.csv** dataset. After addressing data quality issues (handling missing values and basic encoding), the model achieved a cross-validated R² of **~71.1%**. This indicates a strong positive correlation, where the model successfully explains over 70% of the price variance, serving as a robust first baseline for the pricing engine.
+
+**Roadmap for Performance Enhancement:**
+The primary challenge was handling high-cardinality categorical variables (like car make/model) with basic encoding. To reach production-level accuracy (>85%), we recommend:
+1. **Advanced Feature Engineering:** Replacing label encoding with Target Encoding or One-Hot encoding for nominal features.
+2. **Non-Linear Models:** Testing Random Forests or Gradient Boosting, which are better at capturing non-linear pricing plateaus.
+3. **Scaling & Outliers:** Standardizing numeric features and removing extreme price outliers to stabilize regression weights.
+
+--------------------------------------------------
+--- Cell 58 (markdown) ---
+## Wine Quality Results and Infographic
+
+**Executive Report: Wine Quality Sensory Analysis**
+
+**Methodological Summary and Results:**
+This segment of the analysis employed a machine learning framework on the Red Wine Quality dataset to predict sensory quality ratings (0-10) using purely physicochemical laboratory data. The project analyzed several chemical factors, including alcohol concentration, pH levels, and volatile acidity. We deployed a Linear Regression model integrated with a 5-Fold Cross-Validation loop. The resulting metrics showed a moderate R², indicating that while physical chemistry is definitely correlated with perceived quality, a simple linear approach has difficulty mapping these continuous inputs to the subjective, integer-bounded scores typically provided by experts. The model is highly effective at identifying "average" wines but struggles with the nuances of exceptionally high or low-quality vintages.
+
+**Roadmap for Performance Enhancement:**
+The primary bottleneck is the nature of the target variable: quality is essentially an ordinal class, yet we are treating it as a continuous linear scale. To achieve a "best-in-class" prediction tool, we recommend re-framing this as a Classification or Ordinal Regression problem. Algorithms like SVM with RBF kernels or Neural Networks could capture the subtle chemical "thresholds" that distinguish a 7-score wine from a 6-score wine. Additionally, the dataset is heavily imbalanced toward mid-grade wines. We propose using synthetic data augmentation (SMOTE) to increase the representation of extreme scores, which would allow the model to better distinguish the chemical signatures of premium wines from budget-tier options.
+
+**Prompt to generate the Wine Quality Infographic (for Image Generators):**
+> "A professional, clean, minimalist data science infographic about a Wine Quality Prediction model. The layout is divided into 3 clear visual sections. Section 1 shows a wine glass and lab beaker with text 'Problem: Predicting Wine Quality (0-10)'. Section 2 shows analytical charts and text 'Technique: Linear Regression & 5-Fold Cross Validation'. Section 3 shows a warning or moderate success icon with text 'Results: Moderate Accuracy due to categorical scores'. Modern analytics aesthetic, dark red and corporate white colors, vector art style."
+
+<img src="unnamed (2).png" width="80%">
+
+--------------------------------------------------
+--- Cell 59 (code) ---
+File = "winequality-red.csv"
+Filename = os.path.join(os.getcwd(),'Data',File)
+print(f'Filename with path: \n {Filename}')
+Data = pd.read_csv(Filename)
+Data.head().T
+--------------------------------------------------
+--- Cell 60 (markdown) ---
+## Appendix:
+### Description of the variables (Automobile)
+ 1. make: The name of the produces of the car (a factor).
+ 2. fuel-type: The type of fuel used by the car, either diesel or gas (a factor).
+ 3. aspiration: Type of aspiration of fuel in the motor
+ 4. num-of-doors: The number of passenger doors, either two or four (a factor).
+ 5. body-style: The type of the car (a factor).
+ 6. drive-wheels: The wheels powered by the engine (a factor).
+ 7. engine-location: The location in the car of the engine (a factor).
+ 8. wheel-base: Distance between centers of front and rear wheels (numeric).
+ 9. length: Length of the body in inches (numeric).
+ 10. width: Width of the body in inches (numeric).
+ 11. height: Height in inches (numeric).
+ 12. curb-weight: Total weight in pounds (numeric).
+ 13. engine-type: Mechanical Feature.
+ 14. num-of-cylinders: Mechanical Feature.
+ 15. engine-size: Displacement in cubic inches (numeric).
+ 16. fuel-system: Mechanical Feature.
+ 17. bore: Mechanical Feature (numeric).
+ 18. stroke: Mechanical Feature (numeric).
+ 19. compression-ratio: Mechanical Feature (numeric).
+ 20. horsepower: Power in horsepowers (numeric).
+ 21. peak-rpm: Top speed in rounds-per-minute (numeric).
+ 22. city-mpg: Fuel consumption in city (numeric).
+ 23. highway-mpg: Fuel consumption in highway (numeric).
+ 24. price: Retail price in US Dollars (numeric).
+
+## Description of variables: Wine Quality
+### Input variables:
+1. fixed acidity
+2. volatile acidity
+3. citric acid
+4. residual sugar
+5. chlorides
+6. free sulfur dioxide
+7. total sulfur dioxide
+8. density
+9. pH
+10. sulphates
+11. alcohol
+12. quality (score 0-10)
+
+--------------------------------------------------

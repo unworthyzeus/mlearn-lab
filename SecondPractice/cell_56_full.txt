@@ -1,0 +1,15 @@
+Cell index: 56
+Source:
+ ### Exercise: <font color='red'> Create an infographic for the work done </font>
+1. Explain in words, why the cross validation provides a more accurate estimate of what happens with unseen data.
+2. Explain in words, the usefulness of having a confidence margin.
+Cell index: 56
+Source:
+ ### Exercise: <font color='red'> Create an infographic for the work done </font>
+1. Explain in words, why the cross validation provides a more accurate estimate of what happens with unseen data.
+2. Explain in words, the usefulness of having a confidence margin.
+Cell index: 57
+Source:
+ ### Exercise: <font color='red'> Create an infographic for the work done </font>
+ Use either notebooklm or any chat.
+ Refine the prompt so that the explanation of the work done is clear.
